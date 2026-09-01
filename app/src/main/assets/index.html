@@ -49,6 +49,56 @@ h1{font:700 34px/1.1 "Playfair Display",serif;margin:0;letter-spacing:-.7px}
  main{padding-left:25px;padding-right:25px}.toprow{gap:8px}.select{min-width:0;width:108px}.stats{gap:12px}.stat{min-height:105px;padding:16px 13px}.stat strong{font-size:19px}
  .tx{padding:18px 24px;gap:15px}.dot{width:57px;height:57px}.txright{min-width:0}.amount{font-size:19px}
 }
+    @media (max-width: 600px) {
+  .app-header {
+    padding: 20px 18px 18px;
+  }
+
+  .brand {
+    font-size: 30px;
+  }
+
+  .tag {
+    font-size: 12px;
+    letter-spacing: 1.5px;
+  }
+
+  main {
+    padding: 28px 16px 30px;
+  }
+
+  .toprow {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  h1 {
+    font-size: 30px;
+  }
+
+  .selects {
+    width: 100%;
+    gap: 10px;
+  }
+
+  .select {
+    flex: 1;
+    min-width: 0;
+    height: 54px;
+    padding: 0 14px;
+    font-size: 16px;
+  }
+
+  .empty {
+    min-height: 280px;
+    padding: 28px 20px;
+  }
+
+  .empty p {
+    font-size: 17px;
+  }
+}
 </style>
 </head>
 <body>
@@ -74,10 +124,10 @@ h1{font:700 34px/1.1 "Playfair Display",serif;margin:0;letter-spacing:-.7px}
  <div class="card add-card">
   <div class="switch"><div class="switch-inner"><button id="incomeTab" class="active in">＋ Income</button><button id="expenseTab">− Expense</button></div></div>
   <form id="form" class="form">
-   <div class="field"><label>CATEGORY *</label><select id="category" required><option value="">Select category...</option><option>Salary</option><option>Freelance</option><option>Business</option><option>Food</option><option>Transport</option><option>Shopping</option><option>Rent</option><option>Utilities</option><option>Other</option></select></div>
-   <div class="field"><label>AMOUNT (₹) *</label><input id="amount" type="number" inputmode="decimal" min="0" step="0.01" placeholder="₹ 0.00" required></div>
-   <div class="field"><label>DESCRIPTION</label><input id="description" placeholder="Brief note..."></div>
-   <div class="field"><label>DATE *</label><input id="date" type="date" required></div>
+   <div class="field"><label>CATEGORY *</label><label for="category"></label><select id="category" required><option value="">Select category...</option><option>Salary</option><option>Freelance</option><option>Business</option><option>Food</option><option>Transport</option><option>Shopping</option><option>Rent</option><option>Utilities</option><option>Other</option></select></div>
+   <div class="field"><label>AMOUNT (₹) *</label><label for="amount"></label><input id="amount" type="number" inputmode="decimal" min="0" step="0.01" placeholder="₹ 0.00" required></div>
+   <div class="field"><label>DESCRIPTION</label><label for="description"></label><input id="description" placeholder="Brief note..."></div>
+   <div class="field"><label>DATE *</label><label for="date"></label><input id="date" type="date" required></div>
    <button id="submit" class="submit in" type="submit">Add Income</button>
   </form>
  </div>
@@ -140,4 +190,5 @@ $('date').value=new Date().toISOString().slice(0,10);
 renderDashboard();
 renderTransactions();
 </script>
-</body></html>
+</body>
+</html>
