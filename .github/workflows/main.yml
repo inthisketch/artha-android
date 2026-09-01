@@ -1,0 +1,47 @@
+name: Build Artha Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Extract Android project
+        run: |
+          mkdir -p project
+          unzip -q ArthaAndroid_CloudBuild.zip -d project
+
+          echo "Project contents:"
+          find project -maxdepth 3 -type f | head -100
+
+      - name: Find Gradle project
+        run: |
+          GRADLEW=$(find project -name gradlew -type f | head -1)
+
+          if [ -z "$GRADLEW" ]; then
+            echo "ERROR: gradlew was not found"
+            exit 1
+          fi
+
+          chmod +x "$GRADLEW"
+
+          PROJECT_DIR=$(dirname "$GRADLEW")
+          echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
+
+      - name: Build APK
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: ./gradlew assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Artha-debug-apk
+          path: ${{ env.PROJECT_DIR }}/app/build/outputs/apk/debug/*.apk
