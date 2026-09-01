@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Artha — Personal Finance Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+ --green:#173d1d; --green2:#2e7434; --cream:#f6f2e8; --card:#fbf8f0;
+ --line:#d7cdb7; --text:#20251e; --muted:#746f64; --gold:#b78e19;
+ --red:#962326; --redbg:#f5e6e6; --greenbg:#e6f2e5; --goldbg:#f8efd5;
+}
+*{box-sizing:border-box} html,body{margin:0;min-height:100%;background:var(--cream);color:var(--text);font-family:"DM Sans",sans-serif}
+body{padding-bottom:82px}.app-header{background:var(--green);color:#f8f4e9;padding:25px 32px 23px}
+.brand{font:700 38px/1 "Playfair Display",serif;letter-spacing:-1px}.tag{margin-top:5px;color:#aaa99f;font-size:15px;letter-spacing:2px}
+main{max-width:760px;margin:0 auto;padding:34px 26px 30px}
+.toprow{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px}
+h1{font:700 34px/1.1 "Playfair Display",serif;margin:0;letter-spacing:-.7px}
+.subtitle{font-size:18px;color:#59554c;margin-top:10px}
+.selects{display:flex;gap:13px}.select{height:59px;min-width:108px;padding:0 20px;border:1px solid var(--line);border-radius:7px;background:#faf7ef;font:500 18px "DM Sans";display:flex;align-items:center;justify-content:space-between;gap:16px}
+.select.small{min-width:108px}.chev{font-size:20px}
+.card{background:rgba(255,253,247,.55);border:1px solid var(--line);border-radius:13px;box-shadow:0 2px 6px rgba(49,39,18,.04)}
+.empty{min-height:310px;display:flex;align-items:center;justify-content:center;text-align:center;padding:35px}.empty .rupee{font-size:62px;color:#635c4d;margin-bottom:25px}.empty h2{font:600 25px "Playfair Display";margin:0 0 14px}.empty p{font-size:19px;color:#5f5a50;margin:0}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin:20px 0 22px}.stat{border-radius:9px;padding:17px 18px;min-height:102px}.stat label{display:block;font-weight:700;letter-spacing:1.2px;font-size:14px;margin-bottom:12px}.stat strong{font-size:22px;line-height:1.45;word-break:break-all}.income{background:var(--greenbg);color:#316b36}.expense{background:var(--redbg);color:#8b2b2d}.balance{background:var(--goldbg);color:#b08a16}
+.tx{padding:19px 25px;margin-bottom:13px;display:flex;align-items:center;gap:18px}.dot{width:57px;height:57px;border-radius:50%;background:#e4e9dd;display:grid;place-items:center;flex:none}.dot i{width:16px;height:16px;background:var(--green2);border-radius:50%}.txbody{flex:1}.txname{font-size:23px;font-weight:700}.txdate{font-size:17px;color:#625d53;margin-top:8px}.txright{text-align:right}.amount{font-size:23px;font-weight:700;color:#36743b}.buttons{display:flex;justify-content:flex-end;gap:10px;margin-top:11px}.btn{border:0;border-radius:7px;padding:10px 16px;font-weight:700;font-size:15px;background:#eee7d5;color:#5d584c}.btn.del{background:#f4e5e5;color:#922c2d}
+.add-card{overflow:hidden}.switch{padding:45px 31px 27px;border-bottom:1px solid var(--line)}.switch-inner{display:grid;grid-template-columns:1fr 1fr;background:#eee8d7;border-radius:6px;padding:5px}.switch button{height:64px;border:0;background:transparent;border-radius:5px;font-size:21px;font-weight:600;color:#5d594e}.switch button.active.in{background:var(--green2);color:#fff}.switch button.active.out{background:var(--red);color:#fff}
+.form{padding:34px 31px 31px}.field{margin-bottom:26px}.field label{display:block;font-weight:700;letter-spacing:1.4px;color:#5f5a50;font-size:17px;margin-bottom:13px}.field input,.field select{width:100%;height:79px;border:1px solid var(--line);border-radius:7px;background:#f8f5ed;padding:0 22px;font:400 21px "DM Sans";color:#262922;outline:none}.field input::placeholder{color:#98948a}.submit{width:100%;height:82px;border:0;border-radius:7px;color:#fff;font-size:23px;font-weight:700}.submit.in{background:var(--green2)}.submit.out{background:var(--red)}
+.ratio{padding:24px 25px;margin-bottom:22px}.ratio-head{display:flex;justify-content:space-between;font-weight:700;font-size:16px;letter-spacing:1px}.bar{height:12px;border-radius:8px;background:#e8e1d1;margin-top:17px}.break{overflow:hidden;margin-bottom:17px}.break-head{padding:23px 25px;background:var(--greenbg);font:700 23px "Playfair Display";color:#2d6332}.break-head.red{background:var(--redbg);color:#8e2c2e}.rows{padding:12px 25px 0}.row{padding:15px 0;border-bottom:1px solid #ddd4c2}.row:last-child{border-bottom:0}.rowline{display:flex;align-items:center;gap:10px}.bullet{width:11px;height:11px;border-radius:50%;background:var(--green2);flex:none}.cat{font-size:19px;font-weight:600;flex:1}.rowamt{font:600 21px "DM Sans";color:#36743b}.pct{font-size:15px;color:#615c53}.mini-bar{height:7px;background:#e9e3d5;margin-top:10px;border-radius:4px}.mini-fill{height:100%;background:#34743b;border-radius:4px}.total{display:flex;justify-content:space-between;padding:20px 25px;border-top:1px solid var(--line);font-weight:700;font-size:18px}.total .value{color:#36743b;font-size:22px}.all .break-head{background:var(--card);color:#272b24}.allrow{display:flex;justify-content:space-between;align-items:center;padding:20px 25px;border-bottom:1px solid var(--line)}.badge{font-size:12px;background:#e5f0e4;color:#36723b;border-radius:3px;padding:4px 7px;margin-left:7px;font-weight:700}.allamt{font-size:20px;font-weight:700;color:#36743b}.surplus{background:#eee7d3;border-bottom:0}
+
+.dashboard-hero{background:var(--green);color:#fff;border-radius:13px;padding:28px 25px;margin-bottom:18px;box-shadow:0 3px 8px rgba(49,39,18,.08)}
+.dashboard-hero .eyebrow{font-size:14px;letter-spacing:1.4px;font-weight:700;opacity:.72}.dashboard-hero .big-balance{font:700 39px/1.15 "Playfair Display",serif;margin-top:9px;word-break:break-all}.dashboard-hero .hint{margin-top:8px;font-size:15px;opacity:.78}
+.quick-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:13px;margin-bottom:20px}.quick{padding:20px 19px;min-height:120px}.quick label{display:block;font-size:14px;font-weight:700;letter-spacing:1.1px;margin-bottom:10px}.quick strong{font-size:24px}.quick.income{background:var(--greenbg);color:#316b36}.quick.expense{background:var(--redbg);color:#8b2b2d}.quick.saving{background:var(--goldbg);color:#a27d13}.quick.count{background:#ece9df;color:#555147}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin:24px 0 13px}.section-head h2{font:700 25px "Playfair Display";margin:0}.link-btn{border:0;background:transparent;color:var(--green2);font-weight:700;font-size:15px;padding:7px}
+.dashboard-empty{padding:35px 24px;text-align:center}.dashboard-empty .rupee{font-size:48px;color:#635c4d;margin-bottom:12px}.dashboard-empty h3{font:600 23px "Playfair Display";margin:0 0 8px}.dashboard-empty p{font-size:16px;color:#625d53;margin:0}
+.insight{padding:20px 22px;margin-top:20px}.insight-title{font-weight:700;letter-spacing:1px;font-size:14px;margin-bottom:9px}.insight-text{font-size:18px;line-height:1.45;color:#3f413b}
+@media(max-width:430px){.dashboard-hero{padding:25px 22px}.dashboard-hero .big-balance{font-size:34px}.quick{padding:18px 15px}.quick strong{font-size:20px}}
+.bottom{position:fixed;z-index:20;left:0;right:0;bottom:0;height:82px;background:var(--green);display:grid;grid-template-columns:repeat(4,1fr);padding-bottom:env(safe-area-inset-bottom)}.nav{border:0;background:transparent;color:#b5b8ae;font:700 14px "DM Sans";display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;letter-spacing:.5px}.nav .icon{font-size:27px;font-weight:400;line-height:1}.nav.active{color:#c59b18}.hidden{display:none}
+@media(max-width:560px){
+ .app-header{padding:27px 32px 25px}.brand{font-size:34px}.tag{font-size:14px}
+ main{padding:34px 25px 30px}.toprow{align-items:flex-start}.toprow h1{font-size:34px}.selects{gap:13px}.select{min-width:108px;height:59px;padding:0 18px}
+ .stats{gap:12px}.stat{padding:16px 18px}.stat strong{font-size:20px}
+ .tx{padding:18px 25px}.txname{font-size:21px}.amount{font-size:20px}
+ .form{padding:34px 31px}.switch{padding:45px 31px 27px}
+}
+@media(max-width:430px){
+ main{padding-left:25px;padding-right:25px}.toprow{gap:8px}.select{min-width:0;width:108px}.stats{gap:12px}.stat{min-height:105px;padding:16px 13px}.stat strong{font-size:19px}
+ .tx{padding:18px 24px;gap:15px}.dot{width:57px;height:57px}.txright{min-width:0}.amount{font-size:19px}
+}
+</style>
+</head>
+<body>
+<header class="app-header"><div class="brand">Artha</div><div class="tag">PERSONAL FINANCE TRACKER</div></header>
+<main>
+<section id="dashboardView">
+  <div class="toprow"><div><h1>Dashboard</h1><div class="subtitle">Your money at a glance</div></div></div>
+  <div id="dashboardHero" class="dashboard-hero"></div>
+  <div id="dashboardStats" class="quick-grid"></div>
+  <div class="section-head"><h2>Recent transactions</h2><button class="link-btn" onclick="show('transactions')">View all →</button></div>
+  <div id="dashboardRecent"></div>
+  <div id="dashboardInsight"></div>
+</section>
+
+<section id="transactionsView" class="hidden">
+  <div class="toprow"><h1>Transactions</h1><div class="selects"><div class="select"><span id="monthLabel">Sep</span><span class="chev">⌄</span></div><div class="select"><span id="yearLabel">2026</span><span class="chev">⌄</span></div></div></div>
+  <div id="txStats" class="stats hidden"></div>
+  <div id="txList" class="card empty"><div><div class="rupee">₹</div><h2>No transactions</h2><p>Tap + to add your first entry for Sep 2026</p></div></div>
+</section>
+
+<section id="addView" class="hidden">
+ <h1 style="margin-bottom:32px">Add Transaction</h1>
+ <div class="card add-card">
+  <div class="switch"><div class="switch-inner"><button id="incomeTab" class="active in">＋ Income</button><button id="expenseTab">− Expense</button></div></div>
+  <form id="form" class="form">
+   <div class="field"><label>CATEGORY *</label><select id="category" required><option value="">Select category...</option><option>Salary</option><option>Freelance</option><option>Business</option><option>Food</option><option>Transport</option><option>Shopping</option><option>Rent</option><option>Utilities</option><option>Other</option></select></div>
+   <div class="field"><label>AMOUNT (₹) *</label><input id="amount" type="number" inputmode="decimal" min="0" step="0.01" placeholder="₹ 0.00" required></div>
+   <div class="field"><label>DESCRIPTION</label><input id="description" placeholder="Brief note..."></div>
+   <div class="field"><label>DATE *</label><input id="date" type="date" required></div>
+   <button id="submit" class="submit in" type="submit">Add Income</button>
+  </form>
+ </div>
+</section>
+
+<section id="statementView" class="hidden">
+ <div class="toprow"><div><h1>Monthly Statement</h1><div class="subtitle">Income &amp; expense breakdown</div></div><div class="selects"><div class="select"><span>Sep</span><span class="chev">⌄</span></div><div class="select"><span>2026</span><span class="chev">⌄</span></div></div></div>
+ <div id="statement"></div>
+</section>
+</main>
+<nav class="bottom"><button class="nav active" data-view="dashboard"><span class="icon">⌂</span>HOME</button><button class="nav" data-view="transactions"><span class="icon">≡</span>TRANSACTIONS</button><button class="nav" data-view="add"><span class="icon">＋</span>ADD</button><button class="nav" data-view="statement"><span class="icon">▦</span>STATEMENT</button></nav>
+<script>
+const KEY='artha_transactions_v2';
+let transactions=JSON.parse(localStorage.getItem(KEY)||'[]');
+let type='income';
+const $=id=>document.getElementById(id);
+function money(n){return new Intl.NumberFormat('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2}).format(n)}
+function save(){localStorage.setItem(KEY,JSON.stringify(transactions))}
+function dateText(s){const d=new Date(s+'T00:00:00');return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}).replaceAll(',','')}
+function renderTransactions(){
+ const list=$('txList'); const stats=$('txStats');
+ if(!transactions.length){stats.classList.add('hidden');list.className='card empty';list.innerHTML='<div><div class="rupee">₹</div><h2>No transactions</h2><p>Tap + to add your first entry for Sep 2026</p></div>';return}
+ const income=transactions.filter(x=>x.type==='income').reduce((a,x)=>a+x.amount,0), expense=transactions.filter(x=>x.type==='expense').reduce((a,x)=>a+x.amount,0), balance=income-expense;
+ stats.classList.remove('hidden'); stats.innerHTML=`<div class="stat income"><label>INCOME</label><strong>₹${money(income)}</strong></div><div class="stat expense"><label>EXPENSE</label><strong>₹${money(expense)}</strong></div><div class="stat balance"><label>BALANCE</label><strong>₹${money(balance)}</strong></div>`;
+ list.className='';list.innerHTML=transactions.slice().reverse().map((x,i)=>`<div class="card tx"><div class="dot"><i></i></div><div class="txbody"><div class="txname">${x.category}</div><div class="txdate">${dateText(x.date)}</div>${x.description?`<div class="txdate">${x.description}</div>`:''}</div><div class="txright"><div class="amount">${x.type==='income'?'+':'−'}₹${money(x.amount)}</div><div class="buttons"><button class="btn" onclick="editTx(${transactions.length-1-i})">Edit</button><button class="btn del" onclick="delTx(${transactions.length-1-i})">Del</button></div></div></div>`).join('');
+}
+function renderStatement(){
+ const inc=transactions.filter(x=>x.type==='income'), exp=transactions.filter(x=>x.type==='expense');
+ const sum=a=>a.reduce((s,x)=>s+x.amount,0), income=sum(inc), expense=sum(exp), surplus=income-expense, ratio=income?expense/income*100:0;
+ const groups=a=>Object.entries(a.reduce((m,x)=>(m[x.category]=(m[x.category]||0)+x.amount,m),{}));
+ let h=`<div class="stats"><div class="stat income"><label>INCOME</label><strong>+₹${money(income)}</strong></div><div class="stat expense"><label>EXPENSES</label><strong>−₹${money(expense)}</strong></div><div class="stat balance"><label>SURPLUS</label><strong>+₹${money(surplus)}</strong></div></div>`;
+ h+=`<div class="card ratio"><div class="ratio-head"><span>EXPENSE RATIO</span><span>${ratio.toFixed(1)}%</span></div><div class="bar"></div></div>`;
+ function block(title,arr,red=false){const total=sum(arr), g=groups(arr); if(!arr.length)return `<div class="card break"><div class="break-head ${red?'red':''}">${title}</div><div style="padding:38px;text-align:center;color:#5e594f">No ${red?'expenses':'income'} recorded</div><div class="total"><span>TOTAL</span><span class="value" style="color:${red?'#8e2c2e':'#36743b'}">₹${money(total)}</span></div></div>`;
+ return `<div class="card break"><div class="break-head ${red?'red':''}">${title}</div><div class="rows">${g.map(([k,v])=>`<div class="row"><div class="rowline"><span class="bullet"></span><span class="cat">${k}</span><span class="rowamt">${red?'−':'+'}₹${money(v)}</span><span class="pct">${total?(v/total*100).toFixed(1):'0.0'}%</span></div><div class="mini-bar"><div class="mini-fill" style="width:${total?v/total*100:0}%;${red?'background:#922c2d':''}"></div></div></div>`).join('')}</div><div class="total"><span>TOTAL</span><span class="value" style="color:${red?'#8e2c2e':'#36743b'}">₹${money(total)}</span></div></div>`}
+ h+=block('Income Breakdown',inc)+block('Expense Breakdown',exp,true);
+ h+=`<div class="card break all"><div class="break-head">All Transactions — Sep 2026</div>${transactions.slice().reverse().map(x=>`<div class="allrow"><div><strong style="font-size:18px">${x.category}</strong><span class="badge">${x.type.toUpperCase()}</span><div style="color:#625d53;margin-top:6px">${dateText(x.date).replace('2026','').trim()}</div></div><div class="allamt">${x.type==='income'?'+':'−'}₹${money(x.amount)}</div></div>`).join('')}<div class="total surplus"><span>NET SURPLUS</span><span class="value">+₹${money(surplus)}</span></div></div>`;
+ $('statement').innerHTML=h;
+}
+function renderDashboard(){
+ const income=transactions.filter(x=>x.type==='income').reduce((a,x)=>a+x.amount,0);
+ const expense=transactions.filter(x=>x.type==='expense').reduce((a,x)=>a+x.amount,0);
+ const balance=income-expense;
+ const count=transactions.length;
+ $('dashboardHero').innerHTML=`<div class="eyebrow">CURRENT BALANCE</div><div class="big-balance">₹${money(balance)}</div><div class="hint">${count?`${count} transaction${count===1?'':'s'} recorded`:'Start by adding your first transaction'}</div>`;
+ $('dashboardStats').innerHTML=`<div class="card quick income"><label>TOTAL INCOME</label><strong>₹${money(income)}</strong></div><div class="card quick expense"><label>TOTAL EXPENSES</label><strong>₹${money(expense)}</strong></div><div class="card quick saving"><label>SAVING RATE</label><strong>${income?Math.max(0,(balance/income)*100).toFixed(1):'0.0'}%</strong></div><div class="card quick count"><label>TRANSACTIONS</label><strong>${count}</strong></div>`;
+ const recent=transactions.slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,4);
+ $('dashboardRecent').innerHTML=recent.length?recent.map(x=>`<div class="card tx"><div class="dot"><i></i></div><div class="txbody"><div class="txname">${x.category}</div><div class="txdate">${dateText(x.date)}${x.description?` · ${x.description}`:''}</div></div><div class="txright"><div class="amount" style="color:${x.type==='income'?'#36743b':'#8b2b2d'}">${x.type==='income'?'+':'−'}₹${money(x.amount)}</div></div></div>`).join(''):`<div class="card dashboard-empty"><div class="rupee">₹</div><h3>No transactions yet</h3><p>Add an income or expense to see it here.</p></div>`;
+ let insight='Add your first transaction to start understanding your spending.';
+ if(count){ if(expense===0) insight='Nice start — you have income recorded and no expenses yet.'; else if(balance<0) insight=`Your expenses are ₹${money(Math.abs(balance))} higher than your income. Keep an eye on spending.`; else insight=`You have ₹${money(balance)} left after expenses. That's your current surplus.`; }
+ $('dashboardInsight').innerHTML=`<div class="card insight"><div class="insight-title">QUICK INSIGHT</div><div class="insight-text">${insight}</div></div>`;
+}
+function show(view){['dashboard','transactions','add','statement'].forEach(v=>$(v+'View').classList.toggle('hidden',v!==view));document.querySelectorAll('.nav').forEach(n=>n.classList.toggle('active',n.dataset.view===view));if(view==='dashboard')renderDashboard();if(view==='transactions')renderTransactions();if(view==='statement')renderStatement()}
+$('incomeTab').onclick=()=>setType('income');$('expenseTab').onclick=()=>setType('expense');
+function setType(t){type=t;$('incomeTab').className=t==='income'?'active in':'';$('expenseTab').className=t==='expense'?'active out':'';$('submit').className='submit '+(t==='income'?'in':'out');$('submit').textContent='Add '+(t==='income'?'Income':'Expense')}
+$('form').onsubmit=e=>{e.preventDefault();transactions.push({type,category:$('category').value,amount:Number($('amount').value),description:$('description').value,date:$('date').value});save();e.target.reset();$('date').value=new Date().toISOString().slice(0,10);show('transactions');renderDashboard()}
+window.delTx=i=>{if(confirm('Delete this transaction?')){transactions.splice(i,1);save();renderTransactions();renderStatement();renderDashboard()}}
+window.editTx=i=>{const x=transactions[i];setType(x.type);$('category').value=x.category;$('amount').value=x.amount;$('description').value=x.description||'';$('date').value=x.date;transactions.splice(i,1);save();show('add')}
+document.querySelectorAll('.nav').forEach(n=>n.onclick=()=>show(n.dataset.view));
+$('date').value=new Date().toISOString().slice(0,10);
+renderDashboard();
+renderTransactions();
+</script>
+</body></html>
