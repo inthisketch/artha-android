@@ -14,31 +14,41 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
       - name: Extract Android project
         run: |
           mkdir -p project
           unzip -q ArthaAndroid_CloudBuild.zip -d project
 
           echo "Project contents:"
-          find project -maxdepth 3 -type f | head -100
+          find project -maxdepth 4 -type f | head -100
 
-      - name: Find Gradle project
+      - name: Find Android project
         run: |
-          GRADLEW=$(find project -name gradlew -type f | head -1)
+          SETTINGS=$(find project -type f \( -name settings.gradle -o -name settings.gradle.kts \) | head -1)
 
-          if [ -z "$GRADLEW" ]; then
-            echo "ERROR: gradlew was not found"
+          if [ -z "$SETTINGS" ]; then
+            echo "ERROR: Android Gradle project was not found"
             exit 1
           fi
 
-          chmod +x "$GRADLEW"
+          PROJECT_DIR=$(dirname "$SETTINGS")
 
-          PROJECT_DIR=$(dirname "$GRADLEW")
+          echo "Android project found at: $PROJECT_DIR"
           echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
 
       - name: Build APK
         working-directory: ${{ env.PROJECT_DIR }}
-        run: ./gradlew assembleDebug
+        run: |
+          gradle assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
