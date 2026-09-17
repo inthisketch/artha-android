@@ -384,6 +384,17 @@ select:focus {
   color: var(--danger);
 }
 
+.transaction-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.transaction-right .delete-btn {
+  min-width: 28px;
+  padding: 2px;
+}
+
 /* SEARCH */
 
 .search-row {
@@ -647,6 +658,33 @@ select:focus {
 
   <div class="card">
 
+    <h2 class="card-title">Monthly Statement</h2>
+
+    <div class="search-row" style="margin-bottom:16px">
+      <input id="dashboardMonth" type="month" onchange="updateDashboard()">
+    </div>
+
+    <div class="balance-row">
+      <div class="balance-stat" style="background:var(--light-green)">
+        <span>Monthly Income</span>
+        <strong class="income" id="statementIncome">₹0</strong>
+      </div>
+
+      <div class="balance-stat" style="background:var(--light-green)">
+        <span>Monthly Expenses</span>
+        <strong class="expense" id="statementExpense">₹0</strong>
+      </div>
+    </div>
+
+    <div style="margin-top:14px;font-family:Arial,sans-serif;font-size:13px;color:var(--muted)">
+      Monthly savings:
+      <strong id="statementSavings" style="color:var(--text)">₹0</strong>
+    </div>
+
+  </div>
+
+  <div class="card">
+
     <h2 class="card-title">Spending by Category</h2>
 
     <div id="categoryBreakdown"></div>
@@ -824,6 +862,13 @@ select:focus {
 
       </select>
 
+      <input
+        id="filterMonth"
+        type="month"
+        onchange="renderTransactions()"
+        aria-label="Filter by month"
+      >
+
     </div>
 
     <div id="allTransactions"></div>
@@ -870,6 +915,30 @@ select:focus {
 
     <button
       class="primary-btn"
+      onclick="backupData()"
+      style="margin-bottom:10px"
+    >
+      💾 Backup Data
+    </button>
+
+    <button
+      class="primary-btn"
+      onclick="document.getElementById('restoreFile').click()"
+      style="margin-bottom:10px"
+    >
+      ♻️ Restore Backup
+    </button>
+
+    <input
+      id="restoreFile"
+      type="file"
+      accept=".json,application/json"
+      style="display:none"
+      onchange="restoreData(event)"
+    >
+
+    <button
+      class="primary-btn"
       onclick="clearAllData()"
       style="background:#b3261e"
     >
@@ -890,7 +959,7 @@ select:focus {
     <br>
 
     <p style="color:var(--muted);font-family:Arial,sans-serif;font-size:12px">
-      Version 2.0
+      Version 3.0
     </p>
     
     <p style="color:var(--muted);font-family:Arial,sans-serif;font-size:12px;margin-top:8px">
@@ -1206,6 +1275,44 @@ function updateDashboard() {
   document.getElementById("monthExpense").textContent =
     money(monthExpense);
 
+  /* MONTHLY STATEMENT */
+
+  const dashboardMonth =
+    document.getElementById("dashboardMonth");
+
+  const selectedMonth =
+    dashboardMonth && dashboardMonth.value
+      ? dashboardMonth.value
+      : `${year}-${String(month + 1).padStart(2, "0")}`;
+
+  if (dashboardMonth && !dashboardMonth.value) {
+    dashboardMonth.value = selectedMonth;
+  }
+
+  let statementIncome = 0;
+  let statementExpense = 0;
+
+  transactions.forEach(t => {
+
+    if (t.date.slice(0, 7) !== selectedMonth) return;
+
+    if (t.type === "income") {
+      statementIncome += Number(t.amount);
+    } else {
+      statementExpense += Number(t.amount);
+    }
+
+  });
+
+  document.getElementById("statementIncome").textContent =
+    money(statementIncome);
+
+  document.getElementById("statementExpense").textContent =
+    money(statementExpense);
+
+  document.getElementById("statementSavings").textContent =
+    money(statementIncome - statementExpense);
+
 
   renderRecentTransactions();
 
@@ -1267,6 +1374,9 @@ function renderTransactions() {
   const filter =
         document.getElementById("filterType").value;
 
+  const monthFilter =
+    document.getElementById("filterMonth").value;
+
 
 /* FILTER + SEARCH */
 
@@ -1281,7 +1391,11 @@ function renderTransactions() {
       filter === "all" ||
       t.type === filter;
 
-    return matchesSearch && matchesFilter;
+    const matchesMonth =
+      !monthFilter ||
+      t.date.slice(0, 7) === monthFilter;
+
+    return matchesSearch && matchesFilter && matchesMonth;
 
   });
 
@@ -1386,8 +1500,18 @@ function transactionHTML(t) {
 
         <button
           class="delete-btn"
+          onclick="editTransaction(${t.id})"
+          aria-label="Edit transaction"
+          title="Edit transaction"
+        >
+          ✏️
+        </button>
+
+        <button
+          class="delete-btn"
           onclick="deleteTransaction(${t.id})"
           aria-label="Delete transaction"
+          title="Delete transaction"
         >
           🗑️
         </button>
@@ -1397,6 +1521,83 @@ function transactionHTML(t) {
     </div>
   `;
 
+}
+
+
+/* =====================================================
+   EDIT TRANSACTION
+   ===================================================== */
+
+function editTransaction(id) {
+
+  const transaction =
+    transactions.find(t => t.id === id);
+
+  if (!transaction) return;
+
+  const description =
+    prompt("Description:", transaction.description);
+
+  if (description === null) return;
+
+  const amountText =
+    prompt("Amount (₹):", transaction.amount);
+
+  if (amountText === null) return;
+
+  const amount = Number(amountText);
+
+  if (!description.trim() || !amount || amount <= 0) {
+    toast("Invalid transaction details.");
+    return;
+  }
+
+  const type =
+    prompt("Type: expense or income", transaction.type);
+
+  if (type === null) return;
+
+  const normalizedType =
+    type.trim().toLowerCase();
+
+  if (
+    normalizedType !== "expense" &&
+    normalizedType !== "income"
+  ) {
+    toast("Type must be expense or income.");
+    return;
+  }
+
+  const category =
+    prompt("Category:", transaction.category);
+
+  if (category === null) return;
+
+  const date =
+    prompt("Date (YYYY-MM-DD):", transaction.date);
+
+  if (date === null || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    toast("Use date format YYYY-MM-DD.");
+    return;
+  }
+
+  const note =
+    prompt("Note (optional):", transaction.note || "");
+
+  if (note === null) return;
+
+  transaction.description = description.trim();
+  transaction.amount = amount;
+  transaction.type = normalizedType;
+  transaction.category = category.trim() || "Other";
+  transaction.date = date;
+  transaction.note = note.trim();
+
+  saveData();
+  updateDashboard();
+  renderTransactions();
+
+  toast("Transaction updated ✓");
 }
 
 
@@ -1822,6 +2023,113 @@ function csvEscape(value) {
 
   return string;
 
+}
+
+
+/* =====================================================
+   BACKUP + RESTORE
+   ===================================================== */
+
+function backupData() {
+
+  const backup = {
+    app: "Artha",
+    version: "3.0",
+    exportedAt: new Date().toISOString(),
+    transactions: transactions
+  };
+
+  const blob = new Blob(
+    [JSON.stringify(backup, null, 2)],
+    { type: "application/json" }
+  );
+
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = "artha-backup.json";
+
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+  URL.revokeObjectURL(url);
+
+  toast("Backup created ✓");
+}
+
+
+function restoreData(event) {
+
+  const file =
+    event.target.files && event.target.files[0];
+
+  if (!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = function() {
+
+    try {
+
+      const backup =
+        JSON.parse(reader.result);
+
+      const restored =
+        Array.isArray(backup)
+          ? backup
+          : backup.transactions;
+
+      if (!Array.isArray(restored)) {
+        throw new Error("Invalid backup");
+      }
+
+      const cleaned = restored
+        .filter(t =>
+          t &&
+          t.description &&
+          Number(t.amount) > 0 &&
+          (t.type === "income" || t.type === "expense") &&
+          t.date
+        )
+        .map(t => ({
+          id: Number(t.id) || Date.now() + Math.random(),
+          description: String(t.description),
+          amount: Number(t.amount),
+          type: t.type,
+          category: String(t.category || "Other"),
+          date: String(t.date),
+          note: String(t.note || "")
+        }));
+
+      if (!confirm(
+        "Restore " + cleaned.length +
+        " transactions? This will replace your current data."
+      )) {
+        event.target.value = "";
+        return;
+      }
+
+      transactions = cleaned;
+
+      saveData();
+      updateDashboard();
+      renderTransactions();
+
+      toast("Backup restored ✓");
+
+    } catch (error) {
+
+      toast("Invalid backup file.");
+
+    }
+
+    event.target.value = "";
+
+  };
+
+  reader.readAsText(file);
 }
 
 
