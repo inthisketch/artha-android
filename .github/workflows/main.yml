@@ -20,32 +20,41 @@ jobs:
           distribution: temurin
           java-version: '17'
 
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v4
+
       - name: Extract Android project
-  run: |
-    mkdir -p project
-    unzip -q ArthaAndroid_CloudBuild.zip -d project
-
-    echo "Project contents:"
-    find project -maxdepth 5 -type f | head -100
-
-    APP_MAIN=$(find project -type d -path "*/app/src/main" | head -1)
-
-    if [ -z "$APP_MAIN" ]; then
-      echo "ERROR: Android app directory not found"
-      exit 1
-    fi
-
-    echo "Android app directory: $APP_MAIN"
-
-    mkdir -p "$APP_MAIN/assets"
-
-    cp index.html "$APP_MAIN/assets/index.html"
-
-    echo "Copied latest root index.html into Android assets:"
-    wc -l "$APP_MAIN/assets/index.html"
+        run: |
+          mkdir -p project
+          unzip -q ArthaAndroid_CloudBuild.zip -d project
 
           echo "Project contents:"
-          find project -maxdepth 4 -type f | head -100
+          find project -maxdepth 5 -type f | head -100
+
+          APP_MAIN=$(find project -type d -path "*/app/src/main" | head -1)
+
+          if [ -z "$APP_MAIN" ]; then
+            echo "ERROR: Android app directory not found"
+            exit 1
+          fi
+
+          echo "Android app directory: $APP_MAIN"
+
+          mkdir -p "$APP_MAIN/assets"
+
+          cp index.html "$APP_MAIN/assets/index.html"
+
+          echo "Copied latest root index.html into Android assets:"
+          wc -l "$APP_MAIN/assets/index.html"
+
+          echo "Checking for Artha 3.1 features:"
+          grep -q "Import Transactions" "$APP_MAIN/assets/index.html" \
+            && echo "IMPORT FEATURE FOUND" \
+            || echo "WARNING: Import feature not found"
+
+          grep -q "Export Transactions" "$APP_MAIN/assets/index.html" \
+            && echo "EXPORT FEATURE FOUND" \
+            || echo "WARNING: Export feature not found"
 
       - name: Find Android project
         run: |
