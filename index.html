@@ -572,7 +572,55 @@ select:focus {
 }
 </style>
 </head>
+<script>
+(function () {
+    if (!window.AndroidArthaExport) {
+        window.AndroidArthaExport = true;
 
+        const originalClick = HTMLAnchorElement.prototype.click;
+
+        HTMLAnchorElement.prototype.click = function () {
+            const href = this.href || "";
+            const filename = this.download || "";
+
+            if (
+                filename &&
+                (href.startsWith("blob:") ||
+                 href.startsWith("data:")) &&
+                window.ArthaAndroid
+            ) {
+                fetch(href)
+                    .then(response => response.blob())
+                    .then(blob => {
+
+                        const reader = new FileReader();
+
+                        reader.onloadend = function () {
+
+                            const result = reader.result;
+                            const comma = result.indexOf(",");
+
+                            const base64 =
+                                result.substring(comma + 1);
+
+                            ArthaAndroid.saveFile(
+                                filename,
+                                blob.type || "text/csv",
+                                base64
+                            );
+                        };
+
+                        reader.readAsDataURL(blob);
+                    });
+
+                return;
+            }
+
+            originalClick.call(this);
+        };
+    }
+})();
+</script>
 <body>
 
 <header>
