@@ -915,6 +915,22 @@ select:focus {
 
     <button
       class="primary-btn"
+      onclick="document.getElementById('importCSVFile').click()"
+      style="margin-bottom:10px"
+    >
+      📥 Import Transactions (CSV)
+    </button>
+
+    <input
+      id="importCSVFile"
+      type="file"
+      accept=".csv,text/csv"
+      style="display:none"
+      onchange="importCSV(event)"
+    >
+
+    <button
+      class="primary-btn"
       onclick="backupData()"
       style="margin-bottom:10px"
     >
@@ -959,7 +975,7 @@ select:focus {
     <br>
 
     <p style="color:var(--muted);font-family:Arial,sans-serif;font-size:12px">
-      Version 3.0
+      Version 3.1
     </p>
     
     <p style="color:var(--muted);font-family:Arial,sans-serif;font-size:12px;margin-top:8px">
@@ -2002,6 +2018,175 @@ function exportCSV() {
 }
 
 
+
+/* CSV IMPORT */
+
+function importCSV(event) {
+
+  const file =
+    event.target.files && event.target.files[0];
+
+  if (!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = function() {
+
+    try {
+
+      const rows = parseCSV(reader.result);
+
+      if (rows.length < 2) {
+        throw new Error("No transactions found");
+      }
+
+      const headers = rows[0].map(h =>
+        String(h).trim().toLowerCase()
+      );
+
+      const descriptionIndex = headers.indexOf("description");
+      const amountIndex = headers.indexOf("amount");
+      const typeIndex = headers.indexOf("type");
+      const categoryIndex = headers.indexOf("category");
+      const dateIndex = headers.indexOf("date");
+      const noteIndex = headers.indexOf("note");
+
+      if (
+        descriptionIndex === -1 ||
+        amountIndex === -1 ||
+        typeIndex === -1 ||
+        categoryIndex === -1 ||
+        dateIndex === -1
+      ) {
+        throw new Error("Invalid CSV headers");
+      }
+
+      const imported = rows
+        .slice(1)
+        .filter(row => row.length > 0)
+        .map(row => ({
+          id: Date.now() + Math.random(),
+          description: String(row[descriptionIndex] || "").trim(),
+          amount: Number(String(row[amountIndex] || "").replace(/,/g, "")),
+          type: String(row[typeIndex] || "").trim().toLowerCase(),
+          category: String(row[categoryIndex] || "Other").trim() || "Other",
+          date: String(row[dateIndex] || "").trim(),
+          note: noteIndex >= 0
+            ? String(row[noteIndex] || "").trim()
+            : ""
+        }))
+        .filter(t =>
+          t.description &&
+          Number.isFinite(t.amount) &&
+          t.amount > 0 &&
+          (t.type === "income" || t.type === "expense") &&
+          t.date
+        );
+
+      if (imported.length === 0) {
+        throw new Error("No valid transactions");
+      }
+
+      const confirmed = confirm(
+        "Import " + imported.length +
+        " transactions? This will replace your current Artha data."
+      );
+
+      if (!confirmed) {
+        event.target.value = "";
+        return;
+      }
+
+      transactions = imported;
+
+      saveData();
+      updateDashboard();
+      renderTransactions();
+
+      toast(imported.length + " transactions imported ✓");
+
+    } catch (error) {
+
+      toast("Invalid CSV file.");
+
+    }
+
+    event.target.value = "";
+
+  };
+
+  reader.readAsText(file);
+
+}
+
+
+/* SIMPLE CSV PARSER
+   Supports commas inside quoted fields and escaped quotes. */
+
+function parseCSV(text) {
+
+  const rows = [];
+  let row = [];
+  let value = "";
+  let inQuotes = false;
+
+  text = String(text || "").replace(/^\uFEFF/, "");
+
+  for (let i = 0; i < text.length; i++) {
+
+    const char = text[i];
+    const next = text[i + 1];
+
+    if (char === '"') {
+
+      if (inQuotes && next === '"') {
+        value += '"';
+        i++;
+      } else {
+        inQuotes = !inQuotes;
+      }
+
+    } else if (char === "," && !inQuotes) {
+
+      row.push(value);
+      value = "";
+
+    } else if ((char === "\n" || char === "\r") && !inQuotes) {
+
+      if (char === "\r" && next === "\n") i++;
+
+      row.push(value);
+
+      if (row.some(cell => cell !== "")) {
+        rows.push(row);
+      }
+
+      row = [];
+      value = "";
+
+    } else {
+
+      value += char;
+
+    }
+
+  }
+
+  if (value !== "" || row.length > 0) {
+
+    row.push(value);
+
+    if (row.some(cell => cell !== "")) {
+      rows.push(row);
+    }
+
+  }
+
+  return rows;
+
+}
+
+
 /* CSV ESCAPE */
 
 function csvEscape(value) {
@@ -2034,7 +2219,7 @@ function backupData() {
 
   const backup = {
     app: "Artha",
-    version: "3.0",
+    version: "3.1",
     exportedAt: new Date().toISOString(),
     transactions: transactions
   };
