@@ -51,6 +51,27 @@ jobs:
           mkdir -p "$APP_MAIN/assets"
 
           cp index.html "$APP_MAIN/assets/index.html"
+          
+          echo "Installing updated MainActivity.java"
+
+          MAIN_JAVA=$(find "$APP_MAIN/java" -type f -name "MainActivity.java" | head -1)
+
+           if [ -z "$MAIN_JAVA" ]; then
+            echo "ERROR: MainActivity.java not found"
+              exit 1
+          fi
+
+           echo "Existing MainActivity:"
+           echo "$MAIN_JAVA"
+
+          cp android/MainActivity.java "$MAIN_JAVA"
+
+          echo "Updated MainActivity:"
+          wc -l "$MAIN_JAVA"
+
+          grep -q "ArthaAndroidBridge" "$MAIN_JAVA" \
+          && echo "EXPORT BRIDGE FOUND" \
+          || echo "WARNING: Export bridge not found"
 
           echo "Copied latest root index.html into Android assets:"
           wc -l "$APP_MAIN/assets/index.html"
