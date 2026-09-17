@@ -64,7 +64,14 @@ jobs:
            echo "Existing MainActivity:"
            echo "$MAIN_JAVA"
 
-          cp android/MainActivity.java "$MAIN_JAVA"
+          BRIDGE_MAIN_JAVA="app/src/main/java/com/artha/personalfinance/MainActivity.java"
+
+          if [ ! -f "$BRIDGE_MAIN_JAVA" ]; then
+            echo "ERROR: Updated MainActivity.java was not found at $BRIDGE_MAIN_JAVA"
+            exit 1
+          fi
+
+          cp "$BRIDGE_MAIN_JAVA" "$MAIN_JAVA"
 
           echo "Updated MainActivity:"
           wc -l "$MAIN_JAVA"
